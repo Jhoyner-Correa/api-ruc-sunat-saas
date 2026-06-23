@@ -108,21 +108,22 @@ def extract_razon_social_fallback(html):
 def abbreviate_company_suffix(name):
     """
     Estandariza y unifica los sufijos de tipo societario de la Razón Social,
-    removiendo puntos para mantener una estética limpia y consistente (ej: SRL, SAC, EIRL, SA).
+    asegurando que todos usen puntos (ej: E.I.R.L., S.A.C., S.R.L., S.A., S.A.A.)
+    para mantener la máxima formalidad y coherencia legal en Perú.
     """
     if not name:
         return ""
     
-    # 1. Reemplazar frases largas escritas por abreviaciones sin puntos
+    # 1. Reemplazar frases largas por abreviaciones formales con puntos
     replacements = [
-        (r"\bSOCIEDAD COMERCIAL DE RESPONSABILIDAD LIMITADA\b", "SRL"),
-        (r"\bEMPRESA INDIVIDUAL DE RESPONSABILIDAD LIMITADA\b", "EIRL"),
-        (r"\bSOCIEDAD AN[OÓ]NIMA CERRADA\b", "SAC"),
-        (r"\bSOCIEDAD AN[OÓ]NIMA ABIERTA\b", "SAA"),
-        (r"\bSOCIEDAD AN[OÓ]NIMA\b", "SA"),
-        (r"\bSOCIEDAD DE RESPONSABILIDAD LIMITADA\b", "SRL"),
-        (r"\bSOCIEDAD CIVIL DE RESPONSABILIDAD LIMITADA\b", "S CIVIL RL"),
-        (r"\bSOCIEDAD CIVIL\b", "S CIVIL")
+        (r"\bSOCIEDAD COMERCIAL DE RESPONSABILIDAD LIMITADA\b", "S.R.L."),
+        (r"\bEMPRESA INDIVIDUAL DE RESPONSABILIDAD LIMITADA\b", "E.I.R.L."),
+        (r"\bSOCIEDAD AN[OÓ]NIMA CERRADA\b", "S.A.C."),
+        (r"\bSOCIEDAD AN[OÓ]NIMA ABIERTA\b", "S.A.A."),
+        (r"\bSOCIEDAD AN[OÓ]NIMA\b", "S.A."),
+        (r"\bSOCIEDAD DE RESPONSABILIDAD LIMITADA\b", "S.R.L."),
+        (r"\bSOCIEDAD CIVIL DE RESPONSABILIDAD LIMITADA\b", "S.Civil.R.L."),
+        (r"\bSOCIEDAD CIVIL\b", "S.Civil")
     ]
     
     result = name
@@ -131,14 +132,14 @@ def abbreviate_company_suffix(name):
         if count > 0:
             break  # Salir si se aplicó un reemplazo principal
             
-    # 2. Estandarizar abreviaciones que ya venían con puntos desde SUNAT
-    # Busca siglas con puntos al final o delimitadas y las convierte a siglas limpias
+    # 2. Agregar puntos a las abreviaciones que venían juntas desde la SUNAT (ej: EIRL -> E.I.R.L.)
+    # Se usan límites de palabra (\b) para no alterar palabras que contengan estas letras.
     abbrev_replacements = [
-        (r"\bE\.I\.R\.L\.\b", "EIRL"),
-        (r"\bS\.A\.C\.\b", "SAC"),
-        (r"\bS\.R\.L\.\b", "SRL"),
-        (r"\bS\.A\.A\.\b", "SAA"),
-        (r"\bS\.A\.\b", "SA"),
+        (r"\bEIRL\b", "E.I.R.L."),
+        (r"\bSAC\b", "S.A.C."),
+        (r"\bSRL\b", "S.R.L."),
+        (r"\bSAA\b", "S.A.A."),
+        (r"\bSA\b", "S.A."),
     ]
     
     for pattern, repl in abbrev_replacements:
