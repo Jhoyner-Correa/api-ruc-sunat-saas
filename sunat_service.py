@@ -9,7 +9,7 @@ from requests.adapters import HTTPAdapter
 
 import config
 from cache import cache
-from utils import clean, normalize_key, parse_key_value_pairs, fallback_dom_search, extract_razon_social_fallback
+from utils import clean, normalize_key, parse_key_value_pairs, fallback_dom_search, extract_razon_social_fallback, abbreviate_company_suffix
 
 # Configuración de logs
 logging.basicConfig(level=logging.INFO)
@@ -277,6 +277,10 @@ def consultar_ruc(ruc, bypass_cache=False):
             parts = val_dom.split("-")
             if len(parts) > 1:
                 razon_social = clean("-".join(parts[1:]))
+
+    # Estandarizar y abreviar el tipo societario en la Razón Social de forma profesional
+    if razon_social:
+        razon_social = abbreviate_company_suffix(razon_social)
 
     # Fallback 2: Si el parseo asociativo falló por completo debido a cambio de clases, aplicar DOM Traversal flexible
     if not tipo_contribuyente:

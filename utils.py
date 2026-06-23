@@ -104,3 +104,31 @@ def extract_razon_social_fallback(html):
                 return clean("-".join(parts[1:]))
                 
     return ""
+
+def abbreviate_company_suffix(name):
+    """
+    Estandariza y abrevia los sufijos de tipo societario largos en la Razón Social.
+    Ejemplo: 'MI EMPRESA SOCIEDAD COMERCIAL DE RESPONSABILIDAD LIMITADA' -> 'MI EMPRESA S.R.L.'
+    """
+    if not name:
+        return ""
+    
+    # Lista de reemplazos ordenados (las frases más largas primero para evitar colisiones)
+    replacements = [
+        (r"\bSOCIEDAD COMERCIAL DE RESPONSABILIDAD LIMITADA\b", "S.R.L."),
+        (r"\bEMPRESA INDIVIDUAL DE RESPONSABILIDAD LIMITADA\b", "E.I.R.L."),
+        (r"\bSOCIEDAD AN[OÓ]NIMA CERRADA\b", "S.A.C."),
+        (r"\bSOCIEDAD AN[OÓ]NIMA ABIERTA\b", "S.A.A."),
+        (r"\bSOCIEDAD AN[OÓ]NIMA\b", "S.A."),
+        (r"\bSOCIEDAD DE RESPONSABILIDAD LIMITADA\b", "S.R.L."),
+        (r"\bSOCIEDAD CIVIL DE RESPONSABILIDAD LIMITADA\b", "S.Civil.R.L."),
+        (r"\bSOCIEDAD CIVIL\b", "S.Civil")
+    ]
+    
+    result = name
+    for pattern, repl in replacements:
+        result, count = re.subn(pattern, repl, result, flags=re.IGNORECASE)
+        if count > 0:
+            break  # Salir si se aplicó un reemplazo principal
+            
+    return " ".join(result.split())
