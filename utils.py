@@ -107,22 +107,22 @@ def extract_razon_social_fallback(html):
 
 def abbreviate_company_suffix(name):
     """
-    Estandariza y abrevia los sufijos de tipo societario largos en la Razón Social.
-    Ejemplo: 'MI EMPRESA SOCIEDAD COMERCIAL DE RESPONSABILIDAD LIMITADA' -> 'MI EMPRESA S.R.L.'
+    Estandariza y unifica los sufijos de tipo societario de la Razón Social,
+    removiendo puntos para mantener una estética limpia y consistente (ej: SRL, SAC, EIRL, SA).
     """
     if not name:
         return ""
     
-    # Lista de reemplazos ordenados (las frases más largas primero para evitar colisiones)
+    # 1. Reemplazar frases largas escritas por abreviaciones sin puntos
     replacements = [
-        (r"\bSOCIEDAD COMERCIAL DE RESPONSABILIDAD LIMITADA\b", "S.R.L."),
-        (r"\bEMPRESA INDIVIDUAL DE RESPONSABILIDAD LIMITADA\b", "E.I.R.L."),
-        (r"\bSOCIEDAD AN[OÓ]NIMA CERRADA\b", "S.A.C."),
-        (r"\bSOCIEDAD AN[OÓ]NIMA ABIERTA\b", "S.A.A."),
-        (r"\bSOCIEDAD AN[OÓ]NIMA\b", "S.A."),
-        (r"\bSOCIEDAD DE RESPONSABILIDAD LIMITADA\b", "S.R.L."),
-        (r"\bSOCIEDAD CIVIL DE RESPONSABILIDAD LIMITADA\b", "S.Civil.R.L."),
-        (r"\bSOCIEDAD CIVIL\b", "S.Civil")
+        (r"\bSOCIEDAD COMERCIAL DE RESPONSABILIDAD LIMITADA\b", "SRL"),
+        (r"\bEMPRESA INDIVIDUAL DE RESPONSABILIDAD LIMITADA\b", "EIRL"),
+        (r"\bSOCIEDAD AN[OÓ]NIMA CERRADA\b", "SAC"),
+        (r"\bSOCIEDAD AN[OÓ]NIMA ABIERTA\b", "SAA"),
+        (r"\bSOCIEDAD AN[OÓ]NIMA\b", "SA"),
+        (r"\bSOCIEDAD DE RESPONSABILIDAD LIMITADA\b", "SRL"),
+        (r"\bSOCIEDAD CIVIL DE RESPONSABILIDAD LIMITADA\b", "S CIVIL RL"),
+        (r"\bSOCIEDAD CIVIL\b", "S CIVIL")
     ]
     
     result = name
@@ -130,5 +130,18 @@ def abbreviate_company_suffix(name):
         result, count = re.subn(pattern, repl, result, flags=re.IGNORECASE)
         if count > 0:
             break  # Salir si se aplicó un reemplazo principal
+            
+    # 2. Estandarizar abreviaciones que ya venían con puntos desde SUNAT
+    # Busca siglas con puntos al final o delimitadas y las convierte a siglas limpias
+    abbrev_replacements = [
+        (r"\bE\.I\.R\.L\.\b", "EIRL"),
+        (r"\bS\.A\.C\.\b", "SAC"),
+        (r"\bS\.R\.L\.\b", "SRL"),
+        (r"\bS\.A\.A\.\b", "SAA"),
+        (r"\bS\.A\.\b", "SA"),
+    ]
+    
+    for pattern, repl in abbrev_replacements:
+        result = re.sub(pattern, repl, result, flags=re.IGNORECASE)
             
     return " ".join(result.split())
