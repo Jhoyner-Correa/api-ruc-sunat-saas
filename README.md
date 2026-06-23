@@ -77,12 +77,12 @@ python app.py
 
 ---
 
-## 📡 Endpoints de Prueba Públicos (Desplegado en Render)
+## 📡 Endpoints de la API
 
-Tengo un demo desplegado y funcionando en vivo en Render. Puedes probarlo directamente desde aquí:
+Una vez desplegada, puedes realizar pruebas consumiendo los siguientes endpoints (reemplaza `https://tu-servidor-api.com` por la URL de tu servidor):
 
 ### 🩺 1. Estado de la API (Health Check)
-* **URL:** [https://api-ruc-sunat-saas.onrender.com/health](https://api-ruc-sunat-saas.onrender.com/health)
+* **URL:** `https://tu-servidor-api.com/health`
 * **Respuesta esperada:**
 ```json
 {
@@ -93,7 +93,7 @@ Tengo un demo desplegado y funcionando en vivo en Render. Puedes probarlo direct
 ```
 
 ### 🔍 2. Consultar Datos de RUC
-* **URL:** [https://api-ruc-sunat-saas.onrender.com/api/ruc/20131312955](https://api-ruc-sunat-saas.onrender.com/api/ruc/20131312955) *(RUC de la SUNAT)*
+* **URL:** `https://tu-servidor-api.com/api/ruc/20131312955` *(Ejemplo con RUC de la SUNAT)*
 * **Respuesta JSON:**
 ```json
 {
