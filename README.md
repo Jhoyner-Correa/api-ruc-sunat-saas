@@ -1,47 +1,45 @@
-# 🚀 API RUC SUNAT - SaaS Production Ready
+# 🚀 API RUC SUNAT - SaaS Ready (Fines de Prueba)
 
-Una API profesional, modular y de alto rendimiento desarrollada en **Python (Flask)** para consultar datos completos de RUC directamente desde los servidores de la **SUNAT (Perú)**. 
+![Python](https://img.shields.io/badge/Python-3.9+-blue.svg?style=for-the-badge&logo=python&logoColor=white)
+![Flask](https://img.shields.io/badge/Flask-2.x-black.svg?style=for-the-badge&logo=flask&logoColor=white)
+![Render](https://img.shields.io/badge/Render-Hosted-46E3B7.svg?style=for-the-badge&logo=render&logoColor=white)
+![Redis](https://img.shields.io/badge/Redis-Cache-DC382D.svg?style=for-the-badge&logo=redis&logoColor=white)
+![License](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)
 
-Este proyecto está diseñado para funcionar en entornos de producción (SaaS), operando **sin navegadores pesados** (sin Selenium, sin Playwright) mediante peticiones HTTP optimizadas con `requests` y `BeautifulSoup`, logrando latencias mínimas y alta tolerancia a fallos.
+¡Qué tal gente! Habla **Jhoyner Correa Hinostroza**. Les presento esta API profesional que armé para consultar datos completos de cualquier RUC directamente desde los servidores de la **SUNAT (Perú)** sin usar navegadores pesados ni lentos.
 
----
+> [!WARNING]
+> **Aviso Importante:** Esta API ha sido desarrollada con fines de prueba y demostración. Estaré subiendo actualizaciones constantemente para mejorar su rendimiento, robustez y añadir nuevas funciones. 😉
 
-## ✨ Características Principales
-
-* ⚡ **Sin Navegador (Headless HTTP):** Consultas directas al servidor de SUNAT mediante POSTs optimizados para máxima velocidad.
-* 🛡️ **Tolerancia Extrema a Cambios de HTML:** Si SUNAT cambia sus clases CSS de diseño, la API utiliza un algoritmo de búsqueda recursiva en el DOM basado en texto semántico y expresiones regulares (Regex) de respaldo.
-* 📦 **Capa de Caché Inteligente (Redis & RAM):** Sistema de caché auto-configurable. Usa **Redis** para entornos distribuidos (SaaS) y conmuta automáticamente a **MemoryCache** en RAM local para desarrollo. Las consultas recurrentes tardan menos de **5ms**.
-* 🔄 **Evasión Activa de Bloqueos:** Rotación automática de User-Agents y simulación estricta de cookies humanas para evitar baneos de IP o solicitudes de CAPTCHA.
-* 🔍 **Consultas Detalladas Completas:**
-  * Razón Social (100% desinfectada de HTML).
-  * Tipo de Contribuyente, Estado y Condición.
-  * Dirección/Domicilio Fiscal.
-  * Fechas de Inscripción y de Inicio de Actividades.
-  * Sistema de Emisión y Sistema de Contabilidad.
-  * Actividades Económicas (lista sanitizada).
-  * **Representantes Legales** (lista estructurada).
-  * **Locales Anexos** (lista estructurada).
-* 🩺 **SaaS Ready:**
-  * Endpoint `/health` integrado para monitoreo automático en la nube.
-  * Telemetría de tiempos de ejecución (`elapsed_seconds`) en cada respuesta JSON.
-  * Soporte de CORS nativo (sin librerías extras) para consumo desde cualquier frontend (React, Angular, Vue, Flutter, etc.).
-  * Mapeo semántico de códigos de error HTTP (`400`, `404`, `429`, `503`, `502`).
+Desarrollada por este papi: **Jhoyner Correa** 😎.
 
 ---
 
-## 🛠️ Arquitectura del Código
+## 🛠️ ¿Cómo funciona esta joya por dentro?
 
-La solución está separada en módulos independientes para facilitar el mantenimiento y escalabilidad:
+El gran problema del scraping tradicional (como Selenium o Playwright) es que consume demasiada memoria RAM, es lento y los hostings te cobran un ojo de la cara. 
 
-* `app.py`: Servidor Flask, CORS, health checks y enrutamiento con manejo global de errores.
-* `sunat_service.py`: Lógica central del scraper, control de cookies, reintentos con retraso exponencial y subconsultas aisladas.
-* `utils.py`: Normalizadores de texto, desinfectantes HTML y algoritmos de fallbacks en DOM/Regex.
-* `cache.py`: Interfaz de caché unificada para Redis y memoria local con soporte TTL (Time-to-Live).
-* `config.py`: Parámetros globales (timeouts, reintentos, user-agents y variables de entorno).
+Esta API la diseñé usando solo **peticiones HTTP optimizadas** con `requests` y `BeautifulSoup`. Para evitar que la SUNAT nos bloquee la IP o nos pida CAPTCHA, la API hace lo siguiente:
+1. **Simulación Humana:** Hace una petición `GET` rápida al portal de SUNAT para establecer la sesión y capturar las cookies reales (`JSESSIONID`).
+2. **Rotación de Identidad:** En cada consulta rotamos una lista de **User-Agents reales** de navegadores modernos (Chrome, Firefox, Safari).
+3. **Lectura Inteligente (DOM Traversal):** Si la SUNAT cambia sus estilos o nombres de clase de HTML, la API no se rompe. Busca directamente las palabras clave en los textos del HTML ("estado", "condición", "inscripción") y extrae el valor que tiene al lado. Y como último plan de respaldo, usa **expresiones regulares (Regex)**.
+4. **Capa de Caché Adaptable:** Si tienes Redis configurado, guardará ahí los resultados. Si no, usará la memoria RAM de tu servidor local. Así, si consultas el mismo RUC dos veces, la segunda respuesta toma menos de **5 milisegundos**.
 
 ---
 
-## 🚀 Instalación y Uso Local
+## ⚙️ Estructura del Código
+
+* `app.py`: El corazón del servidor Flask. Gestiona las rutas, habilita CORS de forma nativa (para consumir la API desde cualquier frontend) y procesa los códigos de error HTTP adecuados.
+* `sunat_service.py`: Aquí está la magia del scraping, control de sesiones, reintentos y la extracción segura de los representantes legales y locales anexos.
+* `utils.py`: Herramientas de limpieza estricta de HTML y normalización de llaves a formato `snake_case`.
+* `cache.py`: Configura de manera automática la memoria local o la base de datos de Redis.
+* `config.py`: Centraliza los parámetros como timeouts, reintentos y encabezados HTTP.
+
+---
+
+## 🚀 Instalación Rápida para Pruebas
+
+Si quieres probarla en tu propia máquina, sigue estos comandos:
 
 ### 1. Clonar el repositorio
 ```bash
@@ -49,9 +47,9 @@ git clone https://github.com/Jhoyner-Correa/api-ruc-sunat-saas.git
 cd api-ruc-sunat-saas
 ```
 
-### 2. Configurar entorno virtual (Recomendado)
+### 2. Crear y activar tu entorno virtual (Recomendado)
 ```bash
-# En Windows:
+# En Windows (PowerShell/CMD):
 python -m venv venv
 .\venv\Scripts\activate
 
@@ -60,32 +58,32 @@ python3 -m venv venv
 source venv/bin/activate
 ```
 
-### 3. Instalar dependencias
+### 3. Instalar librerías
 ```bash
 pip install -r requirements.txt
 ```
 
-### 4. Probar en consola (Prueba rápida)
+### 4. Ejecutar el test en consola
 ```bash
 python test_api.py
 ```
-*Este script simula consultas para un RUC válido de SUNAT, un RUC inexistente y valida formatos erróneos.*
+*Este test hará consultas reales a la SUNAT e imprimirá los JSON formateados en tu terminal.*
 
-### 5. Iniciar el servidor de desarrollo
+### 5. Correr la API localmente
 ```bash
 python app.py
 ```
-*El servidor se ejecutará localmente en `http://127.0.0.1:5000`.*
+*Ya podrás hacer peticiones en tu navegador o Postman en `http://127.0.0.1:5000/api/ruc/<RUC_A_CONSULTAR>`.*
 
 ---
 
-## 📡 Endpoints de la API
+## 📡 Endpoints de Prueba Públicos (Desplegado en Render)
 
-### 1. Health Check
-* **Método:** `GET`
-* **Ruta:** `/health`
-* **Descripción:** Comprueba si el servidor está en línea. Usado por plataformas cloud (Render, AWS, etc.) para validar el estado del contenedor.
-* **Respuesta (`200 OK`):**
+Tengo un demo desplegado y funcionando en vivo en Render. Puedes probarlo directamente desde aquí:
+
+### 🩺 1. Estado de la API (Health Check)
+* **URL:** [https://api-ruc-sunat-saas.onrender.com/health](https://api-ruc-sunat-saas.onrender.com/health)
+* **Respuesta esperada:**
 ```json
 {
   "status": "healthy",
@@ -94,11 +92,9 @@ python app.py
 }
 ```
 
-### 2. Consultar RUC
-* **Método:** `GET`
-* **Ruta:** `/api/ruc/<ruc>`
-* **Parámetros Opcionales:** `bypass_cache=true` (ignora el caché y consulta en vivo directamente a SUNAT).
-* **Respuesta Exitosa (`200 OK`):**
+### 🔍 2. Consultar Datos de RUC
+* **URL:** [https://api-ruc-sunat-saas.onrender.com/api/ruc/20131312955](https://api-ruc-sunat-saas.onrender.com/api/ruc/20131312955) *(RUC de la SUNAT)*
+* **Respuesta JSON:**
 ```json
 {
   "success": true,
@@ -136,26 +132,24 @@ python app.py
   }
 }
 ```
+*Tip: Si refrescas la consulta, notarás que responde de inmediato (en milisegundos) porque el sistema lee la caché en lugar de ir otra vez a la SUNAT.*
 
 ---
 
-## 🌍 Configuración de Producción (Despliegue en la Nube)
+## 🌎 Despliegue en tu propio Hosting
 
-Este proyecto está listo para ser desplegado en servicios como **Render**, **Railway**, **Heroku** o en servidores dedicados (**DigitalOcean VPS**).
-
-### Variables de Entorno soportadas:
-* `REDIS_URL`: URL de conexión a tu base de datos Redis (ej: `redis://:contraseña@host:puerto/0`). Si no se configura, usará automáticamente **Memory Cache** en RAM.
-* `CACHE_TTL`: Tiempo de persistencia de la caché del RUC (por defecto `86400` segundos = 24 horas).
-* `SUNAT_TIMEOUT`: Tiempo límite de espera para respuestas de la SUNAT (por defecto `8` segundos).
-* `PORT`: Puerto de escucha del servidor (asignado automáticamente por la mayoría de hostings).
-
-### Comando de Arranque en Producción:
-No inicies el servidor usando `python app.py` en producción. Utiliza **Gunicorn** (incluido en `requirements.txt`) para manejar concurrencia:
-```bash
-gunicorn --workers 3 --bind 0.0.0.0:$PORT app:app
-```
+Si quieres subir tu propia versión de esta API a Render o Railway:
+1. Crea un **Web Service** conectado a tu copia de este repositorio.
+2. Usa el comando de construcción: `pip install -r requirements.txt`.
+3. Para el comando de inicio en producción, usa **Gunicorn** (incluido en las dependencias) para soportar múltiples peticiones en paralelo:
+   ```bash
+   gunicorn --workers 3 --bind 0.0.0.0:$PORT app:app
+   ```
+4. (Opcional) Si creas una base de datos Redis, agrega la variable de entorno `REDIS_URL` en tu panel de control para activar el caché distribuido.
 
 ---
 
-## 📄 Licencia
-Este proyecto es de código abierto y está disponible bajo la licencia MIT.
+## 📈 Próximas Actualizaciones
+* Integración con proxies rotativos para evitar bloqueos dinámicos en consultas masivas.
+* Búsqueda por Razón Social (para consultar RUCs sabiendo solo el nombre de la empresa).
+* Optimización de consultas paralelas en sub-peticiones.
