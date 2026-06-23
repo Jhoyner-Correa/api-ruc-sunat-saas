@@ -1,0 +1,17 @@
+# Cache de Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Entornos virtuales
+venv/
+.venv/
+env/
+
+# Variables de entorno locales
+.env
+
+# Archivos de configuración del editor (VS Code, PyCharm)
+.vscode/
+.idea/
